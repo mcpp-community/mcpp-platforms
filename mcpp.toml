@@ -41,7 +41,7 @@ sysroot = "xim:x86_64-freebsd-sysroot@14.5"
 hosted  = true
 runner  = { cmd = ["dirun", "--profile", "{pkg:freebsd-disk-image}/dirun.toml", "--emulator", "{pkg:qemu-x86}/bin/qemu-system-x86_64", "--", "{}"],
             host = "any", hosts = ["linux-x86_64"],
-            requires = ["xim:dirun@0.6.0", "xim:freebsd-disk-image@14.5", "xim:qemu-x86@9.2.4-1"], enabled = false }
+            requires = ["xim:dirun@0.6.0", "xim:freebsd-disk-image@14.5-1", "xim:qemu-x86@9.2.4-1"], enabled = false }
 
 [[platform.provider]]
 serves  = ["aarch64-freebsd"]
@@ -50,7 +50,7 @@ hosted  = true
 runner  = { cmd = ["dirun", "--profile", "{pkg:aarch64-freebsd-disk-image}/dirun.toml", "--var", "firmware={pkg:ovmf}/share/edk2/edk2-aarch64-code.fd",
                    "--emulator", "{pkg:qemu-system}/bin/qemu-system-aarch64", "--", "{}"],
             host = "any", hosts = ["linux-x86_64"],
-            requires = ["xim:dirun@0.6.0", "xim:aarch64-freebsd-disk-image@14.5", "xim:ovmf@9.2.4-4", "xim:qemu-system@9.2.4"], enabled = false }
+            requires = ["xim:dirun@0.6.0", "xim:aarch64-freebsd-disk-image@14.5-1", "xim:ovmf@9.2.4-4", "xim:qemu-system@9.2.4"], enabled = false }
 
 # ── NetBSD ──────────────────────────────────────────────────────────────────
 
@@ -85,7 +85,7 @@ layers  = { "c++-abi" = "llvm.libcxx@22.1.8.3" }
 hosted  = true
 runner  = { cmd = ["dirun", "--profile", "{pkg:netbsd-disk-image}/dirun.toml", "--emulator", "{pkg:qemu-x86}/bin/qemu-system-x86_64", "--", "{}"],
             host = "any", hosts = ["linux-x86_64"],
-            requires = ["xim:dirun@0.6.0", "xim:netbsd-disk-image@10.2", "xim:qemu-x86@9.2.4-1"], enabled = false }
+            requires = ["xim:dirun@0.6.0", "xim:netbsd-disk-image@10.2-1", "xim:qemu-x86@9.2.4-1"], enabled = false }
 
 [[platform.provider]]
 serves  = ["aarch64-netbsd"]
