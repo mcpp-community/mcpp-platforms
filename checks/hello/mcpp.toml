@@ -1,0 +1,30 @@
+# The check of every row (.github/workflows/ci.yml): a C++ program with the std
+# module, an exception and its arguments, built for the row and, where the row
+# has a runner, run there; its status is 7.
+[package]
+name    = "hello"
+version = "0.1.0"
+
+[target.x86_64-freebsd]
+platform = { path = "../.." }
+runner   = { enabled = true }
+
+[target.aarch64-freebsd]
+platform = { path = "../.." }
+runner   = { enabled = true }
+
+[target.x86_64-netbsd]
+platform = { path = "../.." }
+runner   = { enabled = true }
+
+[target.aarch64-netbsd]
+platform = { path = "../.." }
+runner   = { enabled = true }
+
+[target.x86_64-openbsd]
+platform = { path = "../.." }
+runner   = { enabled = true }
+
+[target.aarch64-openbsd]
+platform = { path = "../.." }
+runner   = { enabled = true }
