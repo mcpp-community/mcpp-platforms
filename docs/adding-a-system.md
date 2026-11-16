@@ -72,7 +72,7 @@ fetches a machine image ([SPEC-016 §6](https://github.com/mcpp-community/mcpp/b
 
 ```toml
 [target.x86_64-netbsd]
-runner = { enabled = true }
+runner = true
 ```
 
 ## Tiers

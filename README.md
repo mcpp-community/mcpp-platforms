@@ -31,10 +31,10 @@ platform:
 
 ```toml
 [target.x86_64-netbsd]
-runner = { enabled = true }
+runner = true
 
 [target.'cfg(platform = "platforms")']
-runner = { enabled = true }
+runner = true
 ```
 
 Adding a system: [docs/adding-a-system.md](docs/adding-a-system.md).

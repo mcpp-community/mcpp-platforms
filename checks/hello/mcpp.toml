@@ -11,4 +11,4 @@ version = "0.1.0"
 # (mcpp SPEC-013 §3.1).
 [target.'cfg(any(os = "freebsd", os = "netbsd", os = "openbsd"))']
 platform = { path = "../.." }
-runner   = { enabled = true }
+runner   = true
