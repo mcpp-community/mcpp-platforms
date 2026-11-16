@@ -10,7 +10,7 @@ providers); this document states the procedure and what each part must hold.
 | System | Rows | Base | Runner | State |
 |---|---|---|---|---|
 | FreeBSD 14.5 | `x86_64-freebsd`, `aarch64-freebsd` (mcpp's built-in rows) | the release's base set | both | `preview` |
-| NetBSD 10.2 | `x86_64-netbsd`, `aarch64-netbsd` | the release's base and comp sets | x86_64 | `preview` |
+| NetBSD 10.2 | `x86_64-netbsd`, `aarch64-netbsd` | the release's base and comp sets; the C++ layer is libc++ from source (`llvm.libcxx`) | x86_64 | `preview` |
 | OpenBSD 8.0 | `x86_64-openbsd`, `aarch64-openbsd` | the release's base and comp sets | x86_64 | `preview` |
 | illumos (OmniOS r151054) | none | assembled, not published | measured | not included: see below |
 
@@ -28,7 +28,7 @@ links with, or clang's Solaris driver gives lld the GNU options.
 |---|---|---|
 | The system | `[[platform.system]]` in `mcpp.toml` | `name`, the row's os word; `uname`, what `uname -s` answers there |
 | A row per architecture | `[[platform.define]]` | `triple`, `clang-triple` (with the release the sysroot is), `loader`, `object-format = "elf"`, `family`, `execution`, `tier = "preview"`, `standard` |
-| A provider per row | `[[platform.provider]]` | `serves`, `sysroot = "xim:<arch>-<system>-sysroot@<release>"`, `hosted = true`, and for a row whose image exists a `runner` with `enabled = false` |
+| A provider per row | `[[platform.provider]]` | `serves`, `sysroot = "xim:<arch>-<system>-sysroot@<release>"`, `hosted = true`, and for a row whose image exists a `runner` with `enabled = false`; `layers` when a layer comes from a package rather than from the base (below) |
 | A sysroot package | xim-pkgindex, `<arch>-<system>-sysroot` | the release's own headers, crt objects, shared libraries and the static archives of the C library, the C++ run-time and the compiler run-time, with a `mcpp.toml` at its root stating the layers it provides (mcpp docs/22, base packages) |
 | A disk image package | xim-pkgindex, `<system>-disk-image` | the release's official media made a bootable qcow2 with a serial console, and the dirun profile that boots it (xim-pkgindex docs/12) |
 | A check | `.github/workflows/ci.yml` | the row builds a C program and a C++ program with an exception; where it has a runner, both run and their status returns |
@@ -38,6 +38,27 @@ that starts from the publisher's signed or digest-listed release files and
 records them in the package's `PROVENANCE.md`. A change the image needs (a
 serial console, a login) is stated there, at its byte or as the script that
 made it.
+
+## `import std`
+
+Every row compiles `import std`. A base whose C++ library ships module sources
+states them (`std-module`, mcpp docs/22); FreeBSD and OpenBSD ship libc++, and
+their sysroots carry the module sources of its release. A system whose C++
+library ships none (NetBSD: GCC 10's libstdc++) takes the C++ layer from a
+package instead, libc++ built from source over the system's C library:
+
+```toml
+[[platform.provider]]
+serves  = ["x86_64-netbsd"]
+sysroot = "xim:x86_64-netbsd-sysroot@10.2"
+layers  = { "c++-abi" = "llvm.libcxx@22.1.8.3" }
+```
+
+The package replaces the base for that layer alone: the base's C++ headers and
+libraries leave the build, and the C library and the compiler runtime stay the
+system's. What the replacement needs of the compiler runtime and the driver
+does not name is stated for the system's rows (`[platform.build.'cfg(os =
+"netbsd")'] ldflags`: libc++abi unwinds through libgcc_s).
 
 ## The image
 
