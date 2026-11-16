@@ -127,7 +127,7 @@ sysroot = "xim:x86_64-openbsd-sysroot@8.0"
 hosted  = true
 runner  = { cmd = ["dirun", "--profile", "{pkg:openbsd-disk-image}/dirun.toml", "--emulator", "{pkg:qemu-x86}/bin/qemu-system-x86_64", "--", "{}"],
             host = "any", hosts = ["linux-x86_64"],
-            requires = ["xim:dirun@0.6.0", "xim:openbsd-disk-image@8.0", "xim:qemu-x86@9.2.4-1"], enabled = false }
+            requires = ["xim:dirun@0.6.0", "xim:openbsd-disk-image@8.0-1", "xim:qemu-x86@9.2.4-1"], enabled = false }
 
 [[platform.provider]]
 serves  = ["aarch64-openbsd"]
