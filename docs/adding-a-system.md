@@ -2,8 +2,9 @@
 
 A system enters `mcpp.platforms` as rows of its triples, each served by a
 provider that names the system's base and, where the system can be booted, a
-runner. The semantics are mcpp's (SPEC-013 platforms, SPEC-016 targets and
-providers); this document states the procedure and what each part must hold.
+runner. The semantics are mcpp's ([SPEC-013 Platforms](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/platforms.md),
+[SPEC-016 Targets and providers](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/targets-and-providers.md)); this
+document states the procedure and what each part must hold.
 
 ## The systems
 
@@ -29,8 +30,8 @@ links with, or clang's Solaris driver gives lld the GNU options.
 | The system | `[[platform.system]]` in `mcpp.toml` | `name`, the row's os word; `uname`, what `uname -s` answers there |
 | A row per architecture | `[[platform.define]]` | `triple`, `clang-triple` (with the release the sysroot is), `loader`, `object-format = "elf"`, `family`, `execution`, `tier = "preview"`, `standard` |
 | A provider per row | `[[platform.provider]]` | `serves`, `sysroot = "xim:<arch>-<system>-sysroot@<release>"`, `hosted = true`, and for a row whose image exists a `runner` with `enabled = false`; `layers` when a layer comes from a package rather than from the base (below) |
-| A sysroot package | xim-pkgindex, `<arch>-<system>-sysroot` | the release's own headers, crt objects, shared libraries and the static archives of the C library, the C++ run-time and the compiler run-time, with a `mcpp.toml` at its root stating the layers it provides (mcpp docs/22, base packages) |
-| A disk image package | xim-pkgindex, `<system>-disk-image` | the release's official media made a bootable qcow2 with a serial console, and the dirun profile that boots it (xim-pkgindex docs/12) |
+| A sysroot package | xim-pkgindex, `<arch>-<system>-sysroot` | the release's own headers, crt objects, shared libraries and the static archives of the C library, the C++ run-time and the compiler run-time, with a `mcpp.toml` at its root stating the layers it provides ([mcpp docs/22](https://github.com/mcpp-community/mcpp/blob/main/docs/22-target-side.md), base packages; [SPEC-002 §2.5](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/target-side.md)) |
+| A disk image package | xim-pkgindex, `<system>-disk-image` | the release's official media made a bootable qcow2 with a serial console, and the dirun profile that boots it ([xim-pkgindex docs/12](https://github.com/openxlings/xim-pkgindex/blob/main/docs/12-disk-image-assets.md)) |
 | A check | `.github/workflows/ci.yml` | the row builds a C program and a C++ program with an exception; where it has a runner, both run and their status returns |
 
 The assembly of each package is a script in xim-pkgindex `.agents/tools/`
@@ -42,7 +43,7 @@ made it.
 ## `import std`
 
 Every row compiles `import std`. A base whose C++ library ships module sources
-states them (`std-module`, mcpp docs/22); FreeBSD and OpenBSD ship libc++, and
+states them (`std-module`, [mcpp docs/22](https://github.com/mcpp-community/mcpp/blob/main/docs/22-target-side.md)); FreeBSD and OpenBSD ship libc++, and
 their sysroots carry the module sources of its release. A system whose C++
 library ships none (NetBSD: GCC 10's libstdc++) takes the C++ layer from a
 package instead, libc++ built from source over the system's C library:
@@ -67,7 +68,7 @@ login, the shell's quoting and where a disk of files is mounted. It needs no
 network and no interaction beyond the profile's steps. A runner is
 `dirun --profile {pkg:<system>-disk-image}/dirun.toml -- {}`, with the
 emulator a package of xim; it stays `enabled = false`, because its first use
-fetches a machine image (SPEC-016 §6). A project or a machine enables it:
+fetches a machine image ([SPEC-016 §6](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/targets-and-providers.md)). A project or a machine enables it:
 
 ```toml
 [target.x86_64-netbsd]

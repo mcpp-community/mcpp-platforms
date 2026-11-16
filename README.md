@@ -3,7 +3,8 @@
 Rows for systems mcpp's built-in table does not carry, as one platform package,
 `mcpp.platforms`: each system's triples, the base each row links against, and a
 runner that boots the system to run its programs. The engine names no system;
-these rows are data it reads (mcpp SPEC-013, SPEC-016).
+these rows are data it reads (mcpp [SPEC-013](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/platforms.md),
+[SPEC-016](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/targets-and-providers.md)).
 
 ```sh
 mcpp build --target x86_64-netbsd        # the package index names this platform for the row
@@ -25,11 +26,26 @@ libc++ built over NetBSD's C library (the providers' `layers`), and the
 compiler runtime, libgcc_s, stays the system's.
 
 A runner fetches a machine image on its first use, so it is off until a
-project or a machine enables it:
+project or a machine enables it, for one row or for every row of this
+platform:
 
 ```toml
 [target.x86_64-netbsd]
 runner = { enabled = true }
+
+[target.'cfg(platform = "platforms")']
+runner = { enabled = true }
 ```
 
 Adding a system: [docs/adding-a-system.md](docs/adding-a-system.md).
+
+## Further reading
+
+| Topic | mcpp document |
+|---|---|
+| What a platform is, how a project selects one, and the index's platform column | [docs/35 Platforms](https://github.com/mcpp-community/mcpp/blob/main/docs/35-platforms.md); [SPEC-013 Platforms](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/platforms.md) |
+| Rows, providers, systems and runners as data | [SPEC-016 Targets and providers](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/targets-and-providers.md) |
+| The layers of the target side and base packages (a sysroot with `mcpp.toml`) | [docs/22 The target side](https://github.com/mcpp-community/mcpp/blob/main/docs/22-target-side.md); [SPEC-002](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/target-side.md) |
+| Running a program on another system: runners, `enabled`, `--file` | [docs/41 Devices](https://github.com/mcpp-community/mcpp/blob/main/docs/41-devices.md); [docs/09 Commands by scenario](https://github.com/mcpp-community/mcpp/blob/main/docs/09-commands-by-scenario.md) |
+| `[target.<selector>]` and `cfg(...)` | [docs/04 mcpp.toml](https://github.com/mcpp-community/mcpp/blob/main/docs/04-mcpp-toml.md); [manifest semantics](https://github.com/mcpp-community/mcpp/blob/main/docs/specs/manifest-semantics.md) |
+| The sysroot and disk image packages, and their dirun profiles | [xim-pkgindex docs/12 Disk image assets](https://github.com/openxlings/xim-pkgindex/blob/main/docs/12-disk-image-assets.md) |

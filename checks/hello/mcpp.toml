@@ -5,26 +5,10 @@
 name    = "hello"
 version = "0.1.0"
 
-[target.x86_64-freebsd]
-platform = { path = "../.." }
-runner   = { enabled = true }
-
-[target.aarch64-freebsd]
-platform = { path = "../.." }
-runner   = { enabled = true }
-
-[target.x86_64-netbsd]
-platform = { path = "../.." }
-runner   = { enabled = true }
-
-[target.aarch64-netbsd]
-platform = { path = "../.." }
-runner   = { enabled = true }
-
-[target.x86_64-openbsd]
-platform = { path = "../.." }
-runner   = { enabled = true }
-
-[target.aarch64-openbsd]
+# Every row of this repository's platform, from the working copy rather than
+# the package index, with its runner enabled where it has one. Before the
+# platform defines a row, `cfg(os = ...)` is answered by the triple as written
+# (mcpp SPEC-013 §3.1).
+[target.'cfg(any(os = "freebsd", os = "netbsd", os = "openbsd"))']
 platform = { path = "../.." }
 runner   = { enabled = true }
