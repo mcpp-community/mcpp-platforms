@@ -1,0 +1,68 @@
+# TEMPORARY PROBE (draft pull request, closed after its record is read): what a
+# macOS and a Windows host do with the rows of this package. Not a gate.
+name: probe-hosts
+on:
+  pull_request:
+    paths: ['.github/workflows/probe-hosts.yml']
+env:
+  MCPP_VERSION: "2026.11.17.1"
+jobs:
+  probe:
+    name: probe ${{ matrix.row }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, windows-2025]
+        row: [x86_64-freebsd, x86_64-netbsd, x86_64-openbsd]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+        working-directory: checks/hello
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mcpp-community/setup-mcpp@v1
+        with:
+          version: ${{ env.MCPP_VERSION }}
+      - name: Build, every command shown
+        continue-on-error: true
+        run: |
+          mcpp build --target "${{ matrix.row }}" --verbose > build.log 2>&1 || echo "build rc=$?" >> build.log
+          tail -60 build.log
+      - name: The commands that failed, and the compile database
+        if: always()
+        run: |
+          echo "== errors"; grep -n -i "error\|fatal\|cannot\|unknown argument\|unable to find" build.log | head -40 || true
+          echo "== the failed command"; grep -n -B3 "FAILED\|failed:" build.log | head -60 || true
+          cc=$(find target -name compile_commands.json | head -1)
+          if [ -n "$cc" ]; then
+            echo "== std module and first unit commands"
+            python3 - "$cc" <<'PY'
+          import json, sys
+          for e in json.load(open(sys.argv[1]))[:3]:
+              print(e["file"]); print("  ", e.get("command") or " ".join(e["arguments"])); print()
+          PY
+          fi
+          echo "== link lines in build.ninja"
+          n=$(find target -name build.ninja | head -1)
+          [ -n "$n" ] && grep -n "ldflags\|^  command = .*-o \$out\|fuse-ld\|--target\|isysroot\|sysroot" "$n" | head -40 || true
+      - name: What the sysroot's links are on this host
+        if: always()
+        run: |
+          root=$(ls -d "$HOME"/.mcpp/registry/data/xpkgs/xim-x-*${{ matrix.row }}*sysroot*/* 2>/dev/null | head -1)
+          echo "sysroot: $root"
+          [ -n "$root" ] || exit 0
+          for p in usr/include/machine usr/lib/libgcc.a usr/lib/libgcc_s.so usr/lib/libc.so usr/lib/libstdc++.so; do
+            printf '%s: ' "$p"; ls -ld "$root/$p" 2>&1 | head -1
+          done
+          echo "== symbolic links among the first 4000 entries"; find "$root" -type l 2>/dev/null | head -4000 | wc -l
+          echo "== dangling"; find "$root" -type l ! -exec test -e {} \; -print 2>/dev/null | head -20
+          if command -v powershell >/dev/null 2>&1; then
+            powershell -NoProfile -Command "Get-Item '$(cygpath -w "$root/usr/include/machine" 2>/dev/null)' -ErrorAction SilentlyContinue | Format-List Name,Attributes,LinkType,Target" || true
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: probe-${{ matrix.os }}-${{ matrix.row }}
+          path: checks/hello/build.log
