@@ -25,17 +25,34 @@ links with, or clang's Solaris driver gives lld the GNU options.
 
 ## Hosts
 
-The rows build on a Linux host, x86_64 or aarch64, which this repository's CI
-checks. A macOS or Windows host does not build them yet. Measured in the CI of
-0.1.0 with mcpp 2026.11.17.1, the host's own conventions reach the row:
+The rows build on the hosts mcpp runs on, each checked by this repository's CI:
 
-| Host | What reaches the row |
-|---|---|
-| macOS | the Apple SDK's headers in the std module's compile (FreeBSD); libc++ compiled against the host's ctype definitions (NetBSD, `_CTYPE_BL`); the Mach-O linker given ELF options (OpenBSD, `ld64.lld: unknown argument '--disable-new-dtags'`) |
-| Windows | the sysroot's headers not opened (NetBSD, `sys/cdefs.h`); the crt objects not found and the program named `.exe` (FreeBSD) |
+| Host | NetBSD, OpenBSD | FreeBSD |
+|---|---|---|
+| Linux x86_64, aarch64 | built | built |
+| macOS arm64 | built | built |
+| Windows x86_64 | built | not linked |
 
-These are mcpp's to correct (the row, not the host, decides a cross build); the
-rows enter the build matrix of a host when it builds them.
+The row, not the host, decides a cross build: the artifact is an ELF executable
+of the row's system, and the sysroot package is the only source of headers, crt
+objects and libraries. This holds from mcpp 2026.11.17.2 and xlings
+2026.11.17.1. Measured in the CI of 0.1.0 with mcpp 2026.11.17.1, two defects
+let the host's conventions reach the row, and both are corrected there:
+
+| Defect | Seen as | Corrected in |
+|---|---|---|
+| The object format of a row with no format word in its triple was taken from the host | macOS: the Apple SDK's headers in the std module's compile, the Mach-O linker given ELF options; Windows: the link line without the row's sysroot | mcpp 2026.11.17.2 |
+| A link to a directory extracted on Windows was a file link | Windows: the sysroot's headers not opened (`sys/cdefs.h`) | xlings 2026.11.17.1 |
+
+One case remains. On a Windows host the FreeBSD rows compile and do not link:
+FreeBSD's `crtend.o` and `libgcc.a` hold debug sections compressed with zlib,
+and the lld of the Windows LLVM payload is built without zlib (`ld.lld: error:
+... is compressed with ELFCOMPRESS_ZLIB, but lld is not built with zlib
+support`). The correction belongs to that payload; until then those two rows
+are not in the Windows build matrix.
+
+A row runs where its runner does: the disk images boot under QEMU on Linux
+x86_64, which is where the CI runs them.
 
 ## What a system brings
 
