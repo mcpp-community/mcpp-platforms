@@ -1,0 +1,92 @@
+# The rows of mcpp.platforms (docs/adding-a-system.md, "A check"):
+#
+#   build   every row's check (checks/hello: the std module, an exception, its
+#           arguments) is built on the Linux hosts, x86_64 and aarch64, and the
+#           artifact is an ELF executable of the row's system and machine
+#           (docs/adding-a-system.md, "Hosts": a macOS or Windows host does not
+#           build these rows yet);
+#   run     on Linux x86_64, every row with a runner runs the check through
+#           `mcpp run`: dirun boots the system's disk image under QEMU, and the
+#           program's output and status (7) come back.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  MCPP_VERSION: "2026.11.17.1"
+
+jobs:
+  build:
+    name: build ${{ matrix.row }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        row: [x86_64-freebsd, aarch64-freebsd, x86_64-netbsd, aarch64-netbsd, x86_64-openbsd, aarch64-openbsd]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+        working-directory: checks/hello
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mcpp-community/setup-mcpp@v1
+        with:
+          version: ${{ env.MCPP_VERSION }}
+      - name: Build the check for ${{ matrix.row }}
+        run: |
+          mcpp build --target "${{ matrix.row }}"
+          exe=$(find "target/${{ matrix.row }}" -path '*/bin/hello' -type f | head -1)
+          [ -n "$exe" ] || { echo "::error::no executable for ${{ matrix.row }}"; exit 1; }
+          python3 - "$exe" "${{ matrix.row }}" <<'PY'
+          import sys
+          data = open(sys.argv[1], "rb").read(64)
+          row = sys.argv[2]
+          machine = int.from_bytes(data[18:20], "little")
+          want = {"x86_64": 62, "aarch64": 183}[row.split("-")[0]]
+          osabi = data[7]
+          if data[:4] != b"\x7fELF" or machine != want:
+              sys.exit(f"::error::{sys.argv[1]} is not an ELF executable for {row} (machine {machine})")
+          print(f"{row}: ELF, machine {machine}, OS/ABI {osabi}")
+          PY
+
+  run:
+    name: run ${{ matrix.row }} (Linux x86_64, QEMU)
+    strategy:
+      fail-fast: false
+      matrix:
+        row: [x86_64-freebsd, aarch64-freebsd, x86_64-netbsd, x86_64-openbsd]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+        working-directory: checks/hello
+    steps:
+      - uses: actions/checkout@v4
+      # A guest of the host's architecture runs with KVM.
+      - name: KVM for the runner's emulator
+        working-directory: .
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - uses: mcpp-community/setup-mcpp@v1
+        with:
+          version: ${{ env.MCPP_VERSION }}
+      - name: Run the check on ${{ matrix.row }}
+        run: |
+          set +e
+          mcpp run --target "${{ matrix.row }}" -- one "two three" | tr -d '\r' | tee run.log
+          status=${PIPESTATUS[0]}
+          set -e
+          grep -q 'platforms ok: caught \["one", "two three"\]' run.log || { echo "::error::the program's output or arguments"; exit 1; }
+          [ "$status" -eq 7 ] || { echo "::error::the program returned $status, not 7"; exit 1; }
