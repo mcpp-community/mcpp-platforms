@@ -20,6 +20,9 @@ mcpp run   --target x86_64-netbsd        # once the row's runner is enabled
 | `x86_64-openbsd` | `xim:x86_64-openbsd-sysroot@8.0` | the base's libc++ | OpenBSD 8.0 in QEMU (dirun) |
 | `aarch64-openbsd` | `xim:aarch64-openbsd-sysroot@8.0` | the base's libc++ | none |
 
+The rows build on a Linux host, x86_64 or aarch64; a macOS or Windows host does
+not build them yet ([docs/adding-a-system.md](docs/adding-a-system.md#hosts)).
+
 Every row compiles `import std`. NetBSD's own C++ library is GCC 10's
 libstdc++, which ships no module sources; its rows take the C++ layer from
 libc++ built over NetBSD's C library (the providers' `layers`), and the

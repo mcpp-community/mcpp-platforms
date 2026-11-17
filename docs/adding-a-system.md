@@ -23,6 +23,20 @@ options (`-C`, `-z ignore`), ignores `--ld-path` and `-B`, and refuses lld as a
 lld. The row enters when either a platform can name the program the compiler
 links with, or clang's Solaris driver gives lld the GNU options.
 
+## Hosts
+
+The rows build on a Linux host, x86_64 or aarch64, which this repository's CI
+checks. A macOS or Windows host does not build them yet. Measured in the CI of
+0.1.0 with mcpp 2026.11.17.1, the host's own conventions reach the row:
+
+| Host | What reaches the row |
+|---|---|
+| macOS | the Apple SDK's headers in the std module's compile (FreeBSD); libc++ compiled against the host's ctype definitions (NetBSD, `_CTYPE_BL`); the Mach-O linker given ELF options (OpenBSD, `ld64.lld: unknown argument '--disable-new-dtags'`) |
+| Windows | the sysroot's headers not opened (NetBSD, `sys/cdefs.h`); the crt objects not found and the program named `.exe` (FreeBSD) |
+
+These are mcpp's to correct (the row, not the host, decides a cross build); the
+rows enter the build matrix of a host when it builds them.
+
 ## What a system brings
 
 | Part | Where | Holds |

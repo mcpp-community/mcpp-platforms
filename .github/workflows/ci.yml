@@ -1,8 +1,10 @@
 # The rows of mcpp.platforms (docs/adding-a-system.md, "A check"):
 #
 #   build   every row's check (checks/hello: the std module, an exception, its
-#           arguments) is built on Linux, macOS and Windows hosts, and the
-#           artifact is an ELF executable of the row's system and machine;
+#           arguments) is built on the Linux hosts, x86_64 and aarch64, and the
+#           artifact is an ELF executable of the row's system and machine
+#           (docs/adding-a-system.md, "Hosts": a macOS or Windows host does not
+#           build these rows yet);
 #   run     on Linux x86_64, every row with a runner runs the check through
 #           `mcpp run`: dirun boots the system's disk image under QEMU, and the
 #           program's output and status (7) come back.
@@ -27,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15, windows-2025]
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
         row: [x86_64-freebsd, aarch64-freebsd, x86_64-netbsd, aarch64-netbsd, x86_64-openbsd, aarch64-openbsd]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
