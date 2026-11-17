@@ -3,9 +3,7 @@
 #   build   every row's check (checks/hello: the std module, an exception, its
 #           arguments) is built on each host (Linux x86_64 and aarch64, macOS
 #           arm64, Windows x86_64), and the artifact is an ELF executable of
-#           the row's system and machine (docs/adding-a-system.md, "Hosts").
-#           The FreeBSD rows are not built on Windows: its lld reads no
-#           zlib-compressed section, and FreeBSD's crt objects hold some;
+#           the row's system and machine (docs/adding-a-system.md, "Hosts");
 #   run     on Linux x86_64, every row with a runner runs the check through
 #           `mcpp run`: dirun boots the system's disk image under QEMU, and the
 #           program's output and status (7) come back.
@@ -32,9 +30,6 @@ jobs:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, windows-2025]
         row: [x86_64-freebsd, aarch64-freebsd, x86_64-netbsd, aarch64-netbsd, x86_64-openbsd, aarch64-openbsd]
-        exclude:
-          - { os: windows-2025, row: x86_64-freebsd }
-          - { os: windows-2025, row: aarch64-freebsd }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     defaults:

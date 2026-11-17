@@ -25,31 +25,23 @@ links with, or clang's Solaris driver gives lld the GNU options.
 
 ## Hosts
 
-The rows build on the hosts mcpp runs on, each checked by this repository's CI:
+The rows build on every host mcpp runs on, each checked by this repository's
+CI: Linux x86_64 and aarch64, macOS arm64 and Windows x86_64. The row, not the
+host, decides a cross build: the artifact is an ELF executable of the row's
+system, and the sysroot package is the only source of headers, crt objects and
+libraries.
 
-| Host | NetBSD, OpenBSD | FreeBSD |
-|---|---|---|
-| Linux x86_64, aarch64 | built | built |
-| macOS arm64 | built | built |
-| Windows x86_64 | built | not linked |
-
-The row, not the host, decides a cross build: the artifact is an ELF executable
-of the row's system, and the sysroot package is the only source of headers, crt
-objects and libraries. This holds from mcpp 2026.11.17.2 and xlings
-2026.11.17.1. Measured in the CI of 0.1.0 with mcpp 2026.11.17.1, two defects
-let the host's conventions reach the row, and both are corrected there:
+Measured in the CI of 0.1.0 with mcpp 2026.11.17.1, three defects kept a host
+from building a row; each is corrected where it was:
 
 | Defect | Seen as | Corrected in |
 |---|---|---|
 | The object format of a row with no format word in its triple was taken from the host | macOS: the Apple SDK's headers in the std module's compile, the Mach-O linker given ELF options; Windows: the link line without the row's sysroot | mcpp 2026.11.17.2 |
 | A link to a directory extracted on Windows was a file link | Windows: the sysroot's headers not opened (`sys/cdefs.h`) | xlings 2026.11.17.1 |
+| FreeBSD's crt objects and static archives hold zlib-compressed debug sections, and the lld of the Windows LLVM payload is built without zlib | Windows: the FreeBSD rows compiled and did not link (`is compressed with ELFCOMPRESS_ZLIB, but lld is not built with zlib support`) | the FreeBSD sysroot packages, 14.5 revision 2 (the sections decompressed, their contents unchanged) |
 
-One case remains. On a Windows host the FreeBSD rows compile and do not link:
-FreeBSD's `crtend.o` and `libgcc.a` hold debug sections compressed with zlib,
-and the lld of the Windows LLVM payload is built without zlib (`ld.lld: error:
-... is compressed with ELFCOMPRESS_ZLIB, but lld is not built with zlib
-support`). The correction belongs to that payload; until then those two rows
-are not in the Windows build matrix.
+A base whose link inputs a linker cannot read is the base's to correct: a
+sysroot package states in its `PROVENANCE.md` what it changed of the release.
 
 A row runs where its runner does: the disk images boot under QEMU on Linux
 x86_64, which is where the CI runs them.
