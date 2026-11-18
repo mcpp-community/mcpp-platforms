@@ -31,14 +31,16 @@ host, decides a cross build: the artifact is an ELF executable of the row's
 system, and the sysroot package is the only source of headers, crt objects and
 libraries.
 
-Measured in the CI of 0.1.0 with mcpp 2026.11.17.1, three defects kept a host
-from building a row; each is corrected where it was:
+Measured in the CI of 0.1.0, five defects kept a host from building a row; each
+is corrected where it was:
 
 | Defect | Seen as | Corrected in |
 |---|---|---|
 | The object format of a row with no format word in its triple was taken from the host | macOS: the Apple SDK's headers in the std module's compile, the Mach-O linker given ELF options; Windows: the link line without the row's sysroot | mcpp 2026.11.17.2 |
 | A link to a directory extracted on Windows was a file link | Windows: the sysroot's headers not opened (`sys/cdefs.h`) | xlings 2026.11.17.1 |
 | FreeBSD's crt objects and static archives hold zlib-compressed debug sections, and the lld of the Windows LLVM payload is built without zlib | Windows: the FreeBSD rows compiled and did not link (`is compressed with ELFCOMPRESS_ZLIB, but lld is not built with zlib support`) | the FreeBSD sysroot packages, 14.5 revision 2 (the sections decompressed, their contents unchanged) |
+| A built-in row whose system had no naming branch in the engine was named by the host | Windows: the FreeBSD rows built `bin/hello.exe` and archives `.lib`, where this package's NetBSD and OpenBSD rows, whose facts are data, were named correctly | mcpp 2026.11.18.1 (a row's object format and suffixes are read from data: the row, its system, the format's convention) |
+| The package's index entry listed Linux hosts only | macOS, Windows: a project naming `mcpp.platforms@0.1.0` from the index could not install it (`has no build for windows`) | mcpp-index (the entry lists every host) |
 
 A base whose link inputs a linker cannot read is the base's to correct: a
 sysroot package states in its `PROVENANCE.md` what it changed of the release.

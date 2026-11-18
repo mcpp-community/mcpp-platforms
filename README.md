@@ -21,7 +21,7 @@ mcpp run   --target x86_64-netbsd        # once the row's runner is enabled
 | `aarch64-openbsd` | `xim:aarch64-openbsd-sysroot@8.0` | the base's libc++ | none |
 
 The rows build on every host mcpp runs on (Linux x86_64 and aarch64, macOS
-arm64, Windows x86_64) from mcpp 2026.11.17.2
+arm64, Windows x86_64) from mcpp 2026.11.18.1
 ([docs/adding-a-system.md](docs/adding-a-system.md#hosts)).
 
 Every row compiles `import std`. NetBSD's own C++ library is GCC 10's

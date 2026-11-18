@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  MCPP_VERSION: "2026.11.17.2"
+  MCPP_VERSION: "2026.11.18.1"
 
 jobs:
   build:
