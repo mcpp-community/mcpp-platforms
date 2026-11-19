@@ -13,6 +13,8 @@ document states the procedure and what each part must hold.
 | FreeBSD 14.5 | `x86_64-freebsd`, `aarch64-freebsd` (mcpp's built-in rows) | the release's base set | both | `preview` |
 | NetBSD 10.2 | `x86_64-netbsd`, `aarch64-netbsd` | the release's base and comp sets; the C++ layer is libc++ from source (`llvm.libcxx`) | x86_64 | `preview` |
 | OpenBSD 8.0 | `x86_64-openbsd`, `aarch64-openbsd` | the release's base and comp sets | x86_64 | `preview` |
+| GNU/Hurd (Debian, hurd-amd64) | `x86_64-hurd` | the packages of Debian's pre-installed image of 2026-03-14, from the archive's snapshot of that day; the C++ layer is GCC 15's libstdc++ | x86_64 | `preview` |
+| Haiku hrev60431 | `x86_64-haiku` | the revision's system and development packages, with GCC's run-time from HaikuPorts; the C++ layer is GCC's libstdc++ | x86_64 | `preview` |
 | illumos (OmniOS r151054) | none | assembled, not published | measured | not included: see below |
 
 illumos is not included. Its sysroot and disk image were assembled, and C and
@@ -69,7 +71,18 @@ made it.
 
 Every row compiles `import std`. A base whose C++ library ships module sources
 states them (`std-module`, [mcpp docs/22](https://github.com/mcpp-community/mcpp/blob/main/docs/22-target-side.md)); FreeBSD and OpenBSD ship libc++, and
-their sysroots carry the module sources of its release. A system whose C++
+their sysroots carry the module sources of its release. GNU/Hurd and Haiku ship
+GCC 15's libstdc++, whose module sources (`bits/std.cc`) their sysroots state
+with libstdc++'s include directories. A C header that defines a function with
+internal linkage which the std module exports is the base's to correct: Haiku's
+x86_64 `<fenv.h>` defines seven `static __inline`, and its sysroot gives them
+external linkage in C++ (stated in its `PROVENANCE.md`).
+
+The base and the image are of one release: a program is built against the
+libraries it runs with. Measured on GNU/Hurd: a C++ program built against the
+libstdc++ of `sid` of 2026-11-18 did not start in the image of 2026-03-14
+(`GLIBCXX_3.4.36' not found`); the base is taken from the archive's snapshot of
+the image's day. A system whose C++
 library ships none (NetBSD: GCC 10's libstdc++) takes the C++ layer from a
 package instead, libc++ built from source over the system's C library:
 

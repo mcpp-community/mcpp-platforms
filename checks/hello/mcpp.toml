@@ -9,6 +9,6 @@ version = "0.1.0"
 # the package index, with its runner enabled where it has one. Before the
 # platform defines a row, `cfg(os = ...)` is answered by the triple as written
 # (mcpp SPEC-013 §3.1).
-[target.'cfg(any(os = "freebsd", os = "netbsd", os = "openbsd"))']
+[target.'cfg(any(os = "freebsd", os = "netbsd", os = "openbsd", os = "hurd", os = "haiku"))']
 platform = { path = "../.." }
 runner   = true
