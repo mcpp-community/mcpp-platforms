@@ -19,15 +19,20 @@ mcpp run   --target x86_64-netbsd        # once the row's runner is enabled
 | `aarch64-netbsd` | `xim:aarch64-netbsd-sysroot@10.2` | libc++ from source (`llvm.libcxx`) | none |
 | `x86_64-openbsd` | `xim:x86_64-openbsd-sysroot@8.0` | the base's libc++ | OpenBSD 8.0 in QEMU (dirun) |
 | `aarch64-openbsd` | `xim:aarch64-openbsd-sysroot@8.0` | the base's libc++ | none |
+| `x86_64-hurd` | `xim:x86_64-hurd-sysroot@20260314` | the base's libstdc++ | Debian GNU/Hurd in QEMU (dirun) |
+| `x86_64-haiku` | `xim:x86_64-haiku-sysroot@hrev60431` | the base's libstdc++ | Haiku hrev60431 in QEMU (dirun) |
 
 The rows build on every host mcpp runs on (Linux x86_64 and aarch64, macOS
-arm64, Windows x86_64) from mcpp 2026.11.18.1
+arm64, Windows x86_64) from mcpp 2026.11.18.1, but for three pairs: GNU/Hurd and
+Haiku on Windows (mcpp#965), and Haiku on macOS, whose default file system does
+not tell `string.h` from Haiku's `String.h`
 ([docs/adding-a-system.md](docs/adding-a-system.md#hosts)).
 
 Every row compiles `import std`. NetBSD's own C++ library is GCC 10's
 libstdc++, which ships no module sources; its rows take the C++ layer from
 libc++ built over NetBSD's C library (the providers' `layers`), and the
-compiler runtime, libgcc_s, stays the system's.
+compiler runtime, libgcc_s, stays the system's. GNU/Hurd's and Haiku's is
+GCC 15's libstdc++, whose module sources their bases state.
 
 A runner fetches a machine image on its first use, so it is off until a
 project or a machine enables it, for one row or for every row of this

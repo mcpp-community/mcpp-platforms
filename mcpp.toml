@@ -1,7 +1,7 @@
 [package]
 namespace   = "mcpp"
 name        = "platforms"
-version     = "0.1.0"
+version     = "0.2.0"
 description = "Rows for systems the engine does not carry: their definitions, bases and runners"
 license     = "Apache-2.0"
 repo        = "https://github.com/mcpp-community/mcpp-platforms"
@@ -17,7 +17,8 @@ mcpp        = ">=2026.11.17.1"
 # machine enables it (`[target.<row>] runner = { enabled = true }`).
 
 [platform]
-targets   = ["x86_64-freebsd", "aarch64-freebsd", "x86_64-netbsd", "aarch64-netbsd", "x86_64-openbsd", "aarch64-openbsd"]
+targets   = ["x86_64-freebsd", "aarch64-freebsd", "x86_64-netbsd", "aarch64-netbsd", "x86_64-openbsd", "aarch64-openbsd",
+             "x86_64-hurd", "x86_64-haiku"]
 toolchain = "llvm@23.1.3"
 
 [platform.link]
@@ -30,6 +31,11 @@ driver = "compiler"
 # does not name; a program that throws nothing does not need it.
 [platform.build.'cfg(os = "netbsd")']
 ldflags = ["-Wl,--as-needed", "-lgcc_s", "-Wl,--no-as-needed"]
+
+# The compiler's run-time is not built for the Hurd: its rows link the base's
+# libgcc, as the system's own programs do.
+[platform.build.'cfg(os = "hurd")']
+ldflags = ["-rtlib=libgcc", "--unwindlib=libgcc"]
 
 # ── FreeBSD ─────────────────────────────────────────────────────────────────
 # The rows are mcpp's own (its built-in table defines `<arch>-freebsd`); the
@@ -133,3 +139,61 @@ runner  = { cmd = ["dirun", "--profile", "{pkg:openbsd-disk-image}/dirun.toml", 
 serves  = ["aarch64-openbsd"]
 sysroot = "xim:aarch64-openbsd-sysroot@8.0"
 hosted  = true
+
+# ── GNU/Hurd ────────────────────────────────────────────────────────────────
+# Debian GNU/Hurd's amd64 port: glibc on the Hurd, with GCC's run-time and
+# libstdc++, whose std module sources the base states (xim's
+# x86_64-hurd-sysroot@20260314: the package versions of the image of the same
+# day, so a program is built against the libraries it runs with), run in
+# Debian's pre-installed image (xim's hurd-disk-image), whose disks are behind
+# the machine's IDE controller and whose files disk is a tar archive (dirun
+# 0.7.0).
+
+[[platform.system]]
+name  = "hurd"
+uname = "GNU"
+
+[[platform.define]]
+triple        = "x86_64-hurd"
+clang-triple  = "x86_64-pc-hurd-gnu"
+loader        = "/lib/ld-x86-64.so.1"
+object-format = "elf"
+family        = "unix"
+execution     = "hurd"
+tier          = "preview"
+standard      = true
+
+[[platform.provider]]
+serves  = ["x86_64-hurd"]
+sysroot = "xim:x86_64-hurd-sysroot@20260314"
+hosted  = true
+runner  = { cmd = ["dirun", "--profile", "{pkg:hurd-disk-image}/dirun.toml", "--emulator", "{pkg:qemu-x86}/bin/qemu-system-x86_64", "--", "{}"],
+            host = "any", hosts = ["linux-x86_64"],
+            requires = ["xim:dirun@0.7.0", "xim:hurd-disk-image@20260314", "xim:qemu-x86@9.2.4-1"], enabled = false }
+
+# ── Haiku ───────────────────────────────────────────────────────────────────
+# Haiku's x86_64 nightly: libroot with GCC's run-time and libstdc++ from
+# HaikuPorts, whose std module sources the base states (xim's
+# x86_64-haiku-sysroot hrev60431, revision 1; laid out as a running system,
+# boot/system), run in an image of the same revision (xim's haiku-disk-image).
+
+[[platform.system]]
+name  = "haiku"
+uname = "Haiku"
+
+[[platform.define]]
+triple        = "x86_64-haiku"
+clang-triple  = "x86_64-unknown-haiku"
+object-format = "elf"
+family        = "unix"
+execution     = "haiku"
+tier          = "preview"
+standard      = true
+
+[[platform.provider]]
+serves  = ["x86_64-haiku"]
+sysroot = "xim:x86_64-haiku-sysroot@hrev60431"
+hosted  = true
+runner  = { cmd = ["dirun", "--profile", "{pkg:haiku-disk-image}/dirun.toml", "--emulator", "{pkg:qemu-x86}/bin/qemu-system-x86_64", "--", "{}"],
+            host = "any", hosts = ["linux-x86_64"],
+            requires = ["xim:dirun@0.7.0", "xim:haiku-disk-image@hrev60431", "xim:qemu-x86@9.2.4-1"], enabled = false }
