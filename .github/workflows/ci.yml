@@ -30,6 +30,15 @@ jobs:
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, windows-2025]
         row: [x86_64-freebsd, aarch64-freebsd, x86_64-netbsd, aarch64-netbsd, x86_64-openbsd, aarch64-openbsd, x86_64-hurd, x86_64-haiku]
+        # Hosts a row does not build on, each with its cause (docs/adding-a-system.md, "Hosts"):
+        # on Windows, mcpp gives a libstdc++ base's include directories to the std module's
+        # precompile on no host but Linux and macOS (mcpp-community/mcpp#965); Haiku's headers
+        # hold posix/string.h and os/support/String.h, which a case-insensitive file system
+        # (macOS's default) does not tell apart.
+        exclude:
+          - { os: windows-2025, row: x86_64-hurd }
+          - { os: windows-2025, row: x86_64-haiku }
+          - { os: macos-15, row: x86_64-haiku }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     defaults:

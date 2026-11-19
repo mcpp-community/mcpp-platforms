@@ -23,7 +23,9 @@ mcpp run   --target x86_64-netbsd        # once the row's runner is enabled
 | `x86_64-haiku` | `xim:x86_64-haiku-sysroot@hrev60431` | the base's libstdc++ | Haiku hrev60431 in QEMU (dirun) |
 
 The rows build on every host mcpp runs on (Linux x86_64 and aarch64, macOS
-arm64, Windows x86_64) from mcpp 2026.11.18.1
+arm64, Windows x86_64) from mcpp 2026.11.18.1, but for three pairs: GNU/Hurd and
+Haiku on Windows (mcpp#965), and Haiku on macOS, whose default file system does
+not tell `string.h` from Haiku's `String.h`
 ([docs/adding-a-system.md](docs/adding-a-system.md#hosts)).
 
 Every row compiles `import std`. NetBSD's own C++ library is GCC 10's

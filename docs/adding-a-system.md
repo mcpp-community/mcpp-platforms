@@ -47,6 +47,15 @@ is corrected where it was:
 A base whose link inputs a linker cannot read is the base's to correct: a
 sysroot package states in its `PROVENANCE.md` what it changed of the release.
 
+Two rows of 0.2.0 do not build on every host, measured in its CI:
+
+| Row | Host | Cause | Where it is corrected |
+|---|---|---|---|
+| `x86_64-hurd`, `x86_64-haiku` | Windows | the std module's precompile is given neither the base's include directories nor `-nostdinc++`, for a base whose C++ library is libstdc++ (`'bits/stdc++.h' file not found`) | mcpp ([mcpp#965](https://github.com/mcpp-community/mcpp/issues/965)) |
+| `x86_64-haiku` | macOS | Haiku's headers hold `posix/string.h` and `os/support/String.h`, and clang's Haiku driver searches `os/support` first: on a case-insensitive file system (macOS's default) `<string.h>` is BeAPI's `String.h` | not by a package: Haiku's own build asks for a case-sensitive file system on macOS |
+
+CI does not build those pairs; every other pair of a row and a host builds.
+
 A row runs where its runner does: the disk images boot under QEMU on Linux
 x86_64, which is where the CI runs them.
 
