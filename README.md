@@ -16,9 +16,9 @@ mcpp run   --target x86_64-netbsd        # once the row's runner is enabled
 | `x86_64-freebsd` | `xim:x86_64-freebsd-sysroot@14.5` | the base's libc++ | FreeBSD 14.5 in QEMU (dirun) |
 | `aarch64-freebsd` | `xim:aarch64-freebsd-sysroot@14.5` | the base's libc++ | FreeBSD 14.5 in QEMU (dirun) |
 | `x86_64-netbsd` | `xim:x86_64-netbsd-sysroot@10.2` | libc++ from source (`llvm.libcxx`) | NetBSD 10.2 in QEMU (dirun) |
-| `aarch64-netbsd` | `xim:aarch64-netbsd-sysroot@10.2` | libc++ from source (`llvm.libcxx`) | none |
+| `aarch64-netbsd` | `xim:aarch64-netbsd-sysroot@10.2` | libc++ from source (`llvm.libcxx`) | NetBSD 10.2 in QEMU (dirun) |
 | `x86_64-openbsd` | `xim:x86_64-openbsd-sysroot@8.0` | the base's libc++ | OpenBSD 8.0 in QEMU (dirun) |
-| `aarch64-openbsd` | `xim:aarch64-openbsd-sysroot@8.0` | the base's libc++ | none |
+| `aarch64-openbsd` | `xim:aarch64-openbsd-sysroot@8.0` | the base's libc++ | OpenBSD 8.0 in QEMU (dirun) |
 | `x86_64-hurd` | `xim:x86_64-hurd-sysroot@20260314` | the base's libstdc++ | Debian GNU/Hurd in QEMU (dirun) |
 | `x86_64-haiku` | `xim:x86_64-haiku-sysroot@hrev60431` | the base's libstdc++ | Haiku hrev60431 in QEMU (dirun) |
 

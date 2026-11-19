@@ -1,7 +1,7 @@
 [package]
 namespace   = "mcpp"
 name        = "platforms"
-version     = "0.2.0"
+version     = "0.2.1"
 description = "Rows for systems the engine does not carry: their definitions, bases and runners"
 license     = "Apache-2.0"
 repo        = "https://github.com/mcpp-community/mcpp-platforms"
@@ -98,6 +98,12 @@ serves  = ["aarch64-netbsd"]
 sysroot = "xim:aarch64-netbsd-sysroot@10.2"
 layers  = { "c++-abi" = "llvm.libcxx@22.1.8.3" }
 hosted  = true
+# NetBSD 10.2's arm64 live image, booted once (xim's aarch64-netbsd-disk-image), in QEMU's
+# `virt' machine with the EDK II firmware for AArch64, translated on an x86_64 host.
+runner  = { cmd = ["dirun", "--profile", "{pkg:aarch64-netbsd-disk-image}/dirun.toml", "--var", "firmware={pkg:ovmf}/share/edk2/edk2-aarch64-code.fd",
+                   "--emulator", "{pkg:qemu-system}/bin/qemu-system-aarch64", "--", "{}"],
+            host = "any", hosts = ["linux-x86_64"],
+            requires = ["xim:dirun@0.8.0", "xim:aarch64-netbsd-disk-image@10.2", "xim:ovmf@9.2.4-4", "xim:qemu-system@9.2.4"], enabled = false }
 
 # ── OpenBSD ─────────────────────────────────────────────────────────────────
 # OpenBSD 7.4 and later accept system calls only from libc (pinsyscalls): a
@@ -139,6 +145,12 @@ runner  = { cmd = ["dirun", "--profile", "{pkg:openbsd-disk-image}/dirun.toml", 
 serves  = ["aarch64-openbsd"]
 sysroot = "xim:aarch64-openbsd-sysroot@8.0"
 hosted  = true
+# OpenBSD 8.0 for arm64 installed from the release's media (xim's aarch64-openbsd-disk-image),
+# in QEMU's `virt' machine with the EDK II firmware for AArch64 and a Cortex-A72.
+runner  = { cmd = ["dirun", "--profile", "{pkg:aarch64-openbsd-disk-image}/dirun.toml", "--var", "firmware={pkg:ovmf}/share/edk2/edk2-aarch64-code.fd",
+                   "--emulator", "{pkg:qemu-system}/bin/qemu-system-aarch64", "--", "{}"],
+            host = "any", hosts = ["linux-x86_64"],
+            requires = ["xim:dirun@0.8.0", "xim:aarch64-openbsd-disk-image@8.0", "xim:ovmf@9.2.4-4", "xim:qemu-system@9.2.4"], enabled = false }
 
 # ── GNU/Hurd ────────────────────────────────────────────────────────────────
 # Debian GNU/Hurd's amd64 port: glibc on the Hurd, with GCC's run-time and

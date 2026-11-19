@@ -73,7 +73,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        row: [x86_64-freebsd, aarch64-freebsd, x86_64-netbsd, x86_64-openbsd, x86_64-hurd, x86_64-haiku]
+        row: [x86_64-freebsd, aarch64-freebsd, x86_64-netbsd, aarch64-netbsd, x86_64-openbsd, aarch64-openbsd, x86_64-hurd, x86_64-haiku]
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     defaults:

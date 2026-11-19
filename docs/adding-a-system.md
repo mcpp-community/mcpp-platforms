@@ -11,8 +11,8 @@ document states the procedure and what each part must hold.
 | System | Rows | Base | Runner | State |
 |---|---|---|---|---|
 | FreeBSD 14.5 | `x86_64-freebsd`, `aarch64-freebsd` (mcpp's built-in rows) | the release's base set | both | `preview` |
-| NetBSD 10.2 | `x86_64-netbsd`, `aarch64-netbsd` | the release's base and comp sets; the C++ layer is libc++ from source (`llvm.libcxx`) | x86_64 | `preview` |
-| OpenBSD 8.0 | `x86_64-openbsd`, `aarch64-openbsd` | the release's base and comp sets | x86_64 | `preview` |
+| NetBSD 10.2 | `x86_64-netbsd`, `aarch64-netbsd` | the release's base and comp sets; the C++ layer is libc++ from source (`llvm.libcxx`) | both | `preview` |
+| OpenBSD 8.0 | `x86_64-openbsd`, `aarch64-openbsd` | the release's base and comp sets | both | `preview` |
 | GNU/Hurd (Debian, hurd-amd64) | `x86_64-hurd` | the packages of Debian's pre-installed image of 2026-03-14, from the archive's snapshot of that day; the C++ layer is GCC 15's libstdc++ | x86_64 | `preview` |
 | Haiku hrev60431 | `x86_64-haiku` | the revision's system and development packages, with GCC's run-time from HaikuPorts; the C++ layer is GCC's libstdc++ | x86_64 | `preview` |
 | illumos (OmniOS r151054) | none | assembled, not published | measured | not included: see below |
